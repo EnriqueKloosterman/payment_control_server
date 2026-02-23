@@ -46,7 +46,7 @@ This is a robust backend API for a Payment Control system, built with Node.js an
 1.  **Clone the repository:**
 
     ```bash
-    git clone [payment control](https://github.com/EnriqueKloosterman/payment_control_server.git)
+    git clone https://github.com/EnriqueKloosterman/payment_control_server.git
     cd payment-control
     ```
 
