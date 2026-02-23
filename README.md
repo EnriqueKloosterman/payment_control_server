@@ -17,7 +17,9 @@ This is a robust backend API for a Payment Control system, built with Node.js an
 -   **API Documentation:** Interactive API documentation with Swagger.
 -   **Testing:** Unit and integration testing setup with `jest` and `supertest`.
 -   **File Uploads:** Support for file uploads via `multer`.
--   **Invoice Management:** Full CRUD operations for "Facturas" linked to the user.
+-   **Invoice Management:** Full CRUD operations for "Facturas" linked to the user, including pagination, filtering, search, and document export.
+-   **Automated Tasks:** Cron jobs to automatically mark overdue invoices.
+-   **Dashboard Statistics:** Endpoints to aggregate and serve invoice statistics.
 
 ##  Technologies Used
 
@@ -46,7 +48,7 @@ This is a robust backend API for a Payment Control system, built with Node.js an
 1.  **Clone the repository:**
 
     ```bash
-    git clone <https://github.com/EnriqueKloosterman/payment_control_server.git>
+    git clone https://github.com/EnriqueKloosterman/payment_control_server.git
     cd payment-control
     ```
 
@@ -139,7 +141,7 @@ npm test
 ### Covered Components
 - **Controllers**: `auth.controller`, `user.controller`, `facturas.controller`
 - **Middlewares**: `auth.middleware`, `validate.middleware`
-- **Routes (Integration)**: Auth endpoints (`/register`, `/login`), Facturas endpoints (CRUD, stats)
+- **Routes (Integration)**: Auth endpoints (`/register`, `/login`, password recovery), Facturas endpoints (CRUD, stats, PDF export, status updates)
 
 ##  Project Structure
 
