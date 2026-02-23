@@ -46,7 +46,7 @@ This is a robust backend API for a Payment Control system, built with Node.js an
 1.  **Clone the repository:**
 
     ```bash
-    git clone <repository-url>
+    git clone [<repository-url>](https://github.com/EnriqueKloosterman/payment_control_server.git)
     cd payment-control
     ```
 
@@ -121,7 +121,7 @@ Once the server is running, you can access the full API documentation via Swagge
 http://localhost:3000/api-docs
 ```
 
-## 🧪 Testing
+##  Testing
 
 The application uses **Jest** and **Supertest** to ensure reliability and correctness. Testing is divided into two categories:
 
