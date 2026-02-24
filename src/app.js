@@ -30,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
  * Rate Limiting
  * Global rate limiter to prevent DDoS attacks
  */
+app.set('trust proxy', 1); // Trust first proxy (Render)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
