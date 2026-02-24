@@ -78,7 +78,8 @@ module.exports = (sequelize) => {
         attributes: {}
       }
     },
-    timestamps: true // Adds createdAt and updatedAt
+    timestamps: true, // Adds createdAt and updatedAt
+    tableName: 'users' // Fija el nombre en minúsculas en MySQL de Linux
   });
 
   User.associate = (models) => {
