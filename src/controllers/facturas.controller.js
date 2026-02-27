@@ -1,4 +1,5 @@
 const { Factura, User } = require('../models');
+const { Op } = require('sequelize');
 const logger = require('../config/logger');
 const { validationResult } = require('express-validator');
 const ApiFeatures = require('../utils/apiFeatures');
@@ -45,8 +46,31 @@ const createFactura = async (req, res) => {
 const getFacturas = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { year, month, ...otherQuery } = req.query;
     
-    const features = new ApiFeatures(Factura, req.query, { userId })
+    const initialWhere = { userId };
+    
+    if (year || month) {
+      const filterYear = year ? parseInt(year, 10) : new Date().getFullYear();
+      
+      if (month) {
+        const filterMonth = parseInt(month, 10);
+        // month is 1-indexed from the frontend (1 = Jan, 12 = Dec)
+        const startDate = new Date(filterYear, filterMonth - 1, 1);
+        const endDate = new Date(filterYear, filterMonth, 0, 23, 59, 59, 999);
+        initialWhere.fecha_de_vencimiento = {
+          [Op.between]: [startDate, endDate]
+        };
+      } else {
+        const startDate = new Date(filterYear, 0, 1);
+        const endDate = new Date(filterYear, 11, 31, 23, 59, 59, 999);
+        initialWhere.fecha_de_vencimiento = {
+          [Op.between]: [startDate, endDate]
+        };
+      }
+    }
+    
+    const features = new ApiFeatures(Factura, otherQuery, initialWhere)
       .filter()
       .sort()
       .paginate();
