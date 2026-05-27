@@ -10,7 +10,9 @@ describe('User Controller', () => {
     req = {};
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
+      cookie: jest.fn().mockReturnThis(),
+      clearCookie: jest.fn().mockReturnThis()
     };
     jest.clearAllMocks();
   });
@@ -18,12 +20,11 @@ describe('User Controller', () => {
   describe('getProfile', () => {
     it('should return user profile successfully', async () => {
       req.user = {
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440000',
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
         role: 'user',
-        avatar: null,
         createdAt: '2023-01-01T00:00:00.000Z'
       };
 
@@ -32,12 +33,11 @@ describe('User Controller', () => {
       expect(res.json).toHaveBeenCalledWith({
         status: 'success',
         data: {
-          id: 1,
+          id: '550e8400-e29b-41d4-a716-446655440000',
           firstName: 'John',
           lastName: 'Doe',
           email: 'john@example.com',
           role: 'user',
-          avatar: null,
           createdAt: '2023-01-01T00:00:00.000Z'
         }
       });
@@ -56,7 +56,7 @@ describe('User Controller', () => {
       // Create a scenario that throws an error, e.g., missing res.json or similar,
       // But getProfile is quite simple. We can mock res.json to throw an error 
       // just to trigger the catch block.
-      req.user = { id: 1 };
+      req.user = { id: '550e8400-e29b-41d4-a716-446655440000' };
       res.json.mockImplementationOnce(() => {
         throw new Error('Test error');
       });

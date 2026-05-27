@@ -11,8 +11,11 @@ class ApiFeatures {
     excludedFields.forEach(el => delete queryObj[el]);
 
     // Add remaining query params to where clause
+    // Security: don't allow overriding initialWhere keys (e.g. userId)
     for (const key in queryObj) {
-        this.queryObj.where[key] = queryObj[key];
+        if (!(key in this.queryObj.where)) {
+            this.queryObj.where[key] = queryObj[key];
+        }
     }
     return this;
   }

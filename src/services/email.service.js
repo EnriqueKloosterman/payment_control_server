@@ -7,22 +7,13 @@ class EmailService {
     // Using a simple JSON stream transport that just logs to console, or you can configure a real SMTP later.
     
     this.transporter = nodemailer.createTransport({
-      streamTransport: true,
-      newline: 'windows',
-      logger: false // we will use our own logger
-    });
-    
-    // Example for real SMTP (uncomment and configure when going to production):
-    /*
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.mailtrap.io',
-      port: process.env.SMTP_PORT || 2525,
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
       auth: {
-        user: process.env.SMTP_USER || 'your_user',
-        pass: process.env.SMTP_PASS || 'your_password'
-      }
+        user: process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASSWORD,
+      },
     });
-    */
   }
 
   async sendInvoiceDueTodayEmail(userEmail, invoiceDetails) {

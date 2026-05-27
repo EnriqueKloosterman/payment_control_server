@@ -134,7 +134,7 @@ router.get('/:id', facturasController.getFacturaById);
  *       200:
  *         description: File downloaded successfully
  *         content:
- *           text/plain:
+ *           application/pdf:
  *             schema:
  *               type: string
  *               format: binary
@@ -196,8 +196,8 @@ router.patch(
 /**
  * @swagger
  * /api/facturas/{id}:
- *   put:
- *     summary: Update an entire factura details
+ *   patch:
+ *     summary: Update factura details (partial update)
  *     tags: [Facturas]
  *     security:
  *       - bearerAuth: []
@@ -239,7 +239,7 @@ router.patch(
  *       401:
  *         description: Not authorized
  */
-router.put(
+router.patch(
   '/:id',
   facturasValidator.updateFacturaValidator,
   validate,

@@ -244,43 +244,44 @@ const generateFacturaPDF = async (req, res) => {
     }
 
     const doc = new PDFDocument({ margin: 50 });
+
+    doc.on('error', (err) => {
+      logger.error('PDF Stream Error: ' + err.message);
+      if (!res.headersSent) {
+        res.status(500).json({ status: 'error', message: 'Server error' });
+      }
+    });
     
     res.setHeader('Content-disposition', `attachment; filename=factura_${factura.factura}.pdf`);
     res.setHeader('Content-type', 'application/pdf');
 
     doc.pipe(res);
 
-    // PDF Header
     doc
       .fontSize(20)
       .text('INVOICE / FACTURA', { align: 'center' })
       .moveDown();
-      
-    // Invoice Info
+
     doc
       .fontSize(12)
       .text(`Invoice ID: ${factura.id}`)
       .text(`Client/Concept: ${factura.factura}`)
       .moveDown();
 
-    // Divider
     doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke().moveDown();
 
-    // Financial Details
     doc
       .fontSize(14)
       .text(`Total Amount: $${Number(factura.total).toFixed(2)}`, { align: 'left' })
       .text(`Status: ${factura.status.toUpperCase()}`, { align: 'left' })
       .moveDown();
 
-    // Dates
     doc
       .fontSize(10)
       .text(`Due Date: ${factura.fecha_de_vencimiento ? new Date(factura.fecha_de_vencimiento).toLocaleDateString() : 'N/A'}`)
       .text(`Paid Date: ${factura.fecha_de_pago ? new Date(factura.fecha_de_pago).toLocaleDateString() : 'N/A'}`)
       .moveDown(2);
 
-    // Footer
     doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke().moveDown();
     doc
       .fontSize(10)
@@ -291,7 +292,9 @@ const generateFacturaPDF = async (req, res) => {
 
   } catch (error) {
     logger.error('Generate Factura PDF Error: ' + error.message);
-    res.status(500).json({ status: 'error', message: 'Server error' });
+    if (!res.headersSent) {
+      res.status(500).json({ status: 'error', message: 'Server error' });
+    }
   }
 };
 

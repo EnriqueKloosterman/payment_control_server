@@ -24,7 +24,9 @@ describe('Auth Controller', () => {
     };
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
+      cookie: jest.fn().mockReturnThis(),
+      clearCookie: jest.fn().mockReturnThis()
     };
     jest.clearAllMocks();
   });
@@ -35,7 +37,7 @@ describe('Auth Controller', () => {
       bcrypt.genSalt.mockResolvedValue('salt');
       bcrypt.hash.mockResolvedValue('hashedPassword');
       User.create.mockResolvedValue({
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440000',
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
@@ -89,7 +91,7 @@ describe('Auth Controller', () => {
 
     it('should login successfully with correct credentials', async () => {
       const mockUser = {
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440000',
         email: 'john@example.com',
         password: 'hashedPassword',
         role: 'user',

@@ -14,7 +14,9 @@ describe('Auth Middleware', () => {
     req = { headers: {} };
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
+      cookie: jest.fn().mockReturnThis(),
+      clearCookie: jest.fn().mockReturnThis()
     };
     next = jest.fn();
     jest.clearAllMocks();
@@ -23,22 +25,22 @@ describe('Auth Middleware', () => {
 
   it('should call next if token is valid and user exists', async () => {
     req.headers.authorization = 'Bearer validtoken';
-    jwt.verify.mockReturnValue({ id: 1 });
+    jwt.verify.mockReturnValue({ id: '550e8400-e29b-41d4-a716-446655440000' });
     
-    const mockUser = { id: 1, email: 'test@test.com' };
+    const mockUser = { id: '550e8400-e29b-41d4-a716-446655440000', email: 'test@test.com' };
     User.findByPk.mockResolvedValue(mockUser);
 
     await protect(req, res, next);
 
     expect(jwt.verify).toHaveBeenCalledWith('validtoken', 'testsecret');
-    expect(User.findByPk).toHaveBeenCalledWith(1);
+    expect(User.findByPk).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440000');
     expect(req.user).toEqual(mockUser);
     expect(next).toHaveBeenCalled();
   });
 
   it('should return 401 if user does not exist anymore', async () => {
     req.headers.authorization = 'Bearer validtoken';
-    jwt.verify.mockReturnValue({ id: 1 });
+    jwt.verify.mockReturnValue({ id: '550e8400-e29b-41d4-a716-446655440000' });
     
     User.findByPk.mockResolvedValue(null);
 

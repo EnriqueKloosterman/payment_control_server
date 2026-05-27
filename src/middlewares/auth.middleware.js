@@ -28,7 +28,7 @@ const protect = async (req, res, next) => {
       }
 
       req.user = user;
-      next();
+      return next();
     } catch (error) {
       logger.error('Auth Error: ' + error.message);
       return res.status(401).json({ status: 'error', message: 'Not authorized, token failed' });

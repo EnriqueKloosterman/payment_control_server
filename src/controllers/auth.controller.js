@@ -2,29 +2,35 @@ const { User } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const logger = require('../config/logger');
-const { validationResult } = require('express-validator');
 const crypto = require('crypto');
 const sendEmail = require('../utils/email.service');
 
-/**
- * Generate JWT Token
- * @param {object} payload - Data to be encoded in the token (e.g., { id, role })
- * @returns {string} - Signed JWT token
- */
 const generateToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
-/**
- * Generate JWT Refresh Token
- * @param {object} payload - Data to be encoded in the token (e.g., { id })
- * @returns {string} - Signed JWT refresh token
- */
 const generateRefreshToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
     expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+  });
+};
+
+const setRefreshTokenCookie = (res, token) => {
+  res.cookie('refreshToken', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+};
+
+const clearRefreshTokenCookie = (res) => {
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
   });
 };
 
@@ -35,11 +41,6 @@ const generateRefreshToken = (payload) => {
  */
 const register = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ status: 'error', errors: errors.array() });
-    }
-
     const { firstName, lastName, email, password } = req.body;
 
     // 1. Check if user already exists
@@ -76,6 +77,7 @@ const register = async (req, res) => {
       user.refreshToken = refreshToken;
       await user.save();
 
+      setRefreshTokenCookie(res, refreshToken);
       res.status(201).json({
         status: 'success',
         data: {
@@ -104,11 +106,6 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ status: 'error', errors: errors.array() });
-    }
-
     const { email, password } = req.body;
 
     // 1. Find user by email
@@ -128,7 +125,8 @@ const login = async (req, res) => {
       // Save refresh token to DB
       user.refreshToken = refreshToken;
       await user.save();
-      
+
+      setRefreshTokenCookie(res, refreshToken);
       res.json({
         status: 'success',
         data: {
@@ -157,7 +155,7 @@ const login = async (req, res) => {
  */
 const refresh = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = req.body.refreshToken || req.cookies?.refreshToken;
 
     if (!refreshToken) {
       return res.status(401).json({ status: 'error', message: 'No refresh token provided' });
@@ -182,6 +180,7 @@ const refresh = async (req, res) => {
     user.refreshToken = newRefreshToken;
     await user.save();
 
+    setRefreshTokenCookie(res, newRefreshToken);
     res.json({
       status: 'success',
       data: {
@@ -207,6 +206,7 @@ const logout = async (req, res) => {
       user.refreshToken = null;
       await user.save();
     }
+    clearRefreshTokenCookie(res);
     res.json({ status: 'success', message: 'Logged out successfully' });
   } catch (error) {
     logger.error('Logout Error: ' + error.message);
@@ -295,11 +295,13 @@ const resetPassword = async (req, res) => {
 
     await user.save();
 
+    const newRefreshToken = generateRefreshToken({ id: user.id });
+    setRefreshTokenCookie(res, newRefreshToken);
     res.status(200).json({
       status: 'success',
       data: {
         token: generateToken({ id: user.id, role: user.role }),
-        refreshToken: generateRefreshToken({ id: user.id }),
+        refreshToken: newRefreshToken,
       }
     });
   } catch (error) {

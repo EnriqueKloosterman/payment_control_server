@@ -1,13 +1,22 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 
 const swaggerUi = require('swagger-ui-express');
 const path = require('path');
 const swaggerSpecs = require('./config/swagger');
 const logger = require('./config/logger');
 require('dotenv').config();
+const fs = require('fs');
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const app = express();
 
@@ -18,6 +27,8 @@ const app = express();
  */
 app.use(helmet());
 app.use(cors());
+app.use(compression());
+app.use(cookieParser());
 
 /**
  * Body Parsing Middleware
@@ -92,6 +103,18 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 
 /**
+ * Health Check
+ */
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+  });
+});
+
+/**
  * Connectivity Test Route
  */
 app.get('/', (req, res) => {
@@ -105,10 +128,8 @@ app.get('/', (req, res) => {
 const ErrorResponse = require('./utils/errorResponse');
 
 app.use((err, req, res, next) => {
-  let error = { ...err };
-  error.message = err.message;
+  let error = new ErrorResponse(err.message, err.statusCode || 500);
 
-  // Log to console for dev
   logger.error(err.stack);
 
   // Sequelize bad objectid / cast error
@@ -119,7 +140,7 @@ app.use((err, req, res, next) => {
 
   // Sequelize validation error (e.g. notEmpty)
   if (err.name === 'SequelizeValidationError') {
-    const message = Object.values(err.errors).map(val => val.message);
+    const message = Object.values(err.errors).map(val => val.message).join(', ');
     error = new ErrorResponse(message, 400);
   }
 

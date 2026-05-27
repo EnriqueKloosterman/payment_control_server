@@ -26,7 +26,7 @@ describe('Auth Routes (Integration)', () => {
       bcrypt.hash.mockResolvedValue('hashedPassword');
       // Mock user creation
       User.create.mockResolvedValue({
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440000',
         firstName: 'Integration',
         lastName: 'Test',
         email: 'int@test.com',
@@ -70,7 +70,7 @@ describe('Auth Routes (Integration)', () => {
     it('should login an existing user', async () => {
       // Mock user finding
       const mockUser = {
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440000',
         email: 'int@test.com',
         password: 'hashedPassword',
         role: 'user',

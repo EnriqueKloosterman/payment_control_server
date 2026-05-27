@@ -16,7 +16,7 @@ This is a robust backend API for a Payment Control system, built with Node.js an
 -   **Logging:** Detailed logging with `winston`.
 -   **API Documentation:** Interactive API documentation with Swagger.
 -   **Testing:** Unit and integration testing setup with `jest` and `supertest`.
--   **File Uploads:** Support for file uploads via `multer`.
+-   **File Uploads:** Static file serving via `/uploads` directory.
 -   **Invoice Management:** Full CRUD operations for "Facturas" linked to the user, including pagination, filtering, search, and document export.
 -   **Automated Tasks:** Cron jobs to automatically mark overdue invoices.
 -   **Dashboard Statistics:** Endpoints to aggregate and serve invoice statistics.

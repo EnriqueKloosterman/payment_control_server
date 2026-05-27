@@ -1,7 +1,7 @@
 const { check } = require('express-validator');
 const validate = require('./validate.middleware');
 
-const passwordValidation = check('password', 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one symbol')
+const passwordValidation = check('password', 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character')
   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/);
 
 const validateRegister = [
@@ -23,8 +23,20 @@ const validateResetPassword = [
   validate
 ];
 
+const validateForgotPassword = [
+  check('email', 'Please include a valid email').isEmail(),
+  validate
+];
+
+const validateRefreshToken = [
+  check('refreshToken', 'Refresh token is required').not().isEmpty(),
+  validate
+];
+
 module.exports = {
   validateRegister,
   validateLogin,
-  validateResetPassword
+  validateResetPassword,
+  validateForgotPassword,
+  validateRefreshToken
 };

@@ -29,7 +29,7 @@ describe('Facturas Controller', () => {
 
   beforeEach(() => {
     req = {
-      user: { id: 1 },
+      user: { id: '550e8400-e29b-41d4-a716-446655440000' },
       body: {},
       params: {},
       query: {}
@@ -37,7 +37,9 @@ describe('Facturas Controller', () => {
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
-      setHeader: jest.fn()
+      setHeader: jest.fn(),
+      cookie: jest.fn().mockReturnThis(),
+      clearCookie: jest.fn().mockReturnThis()
     };
     jest.clearAllMocks();
     
@@ -56,7 +58,7 @@ describe('Facturas Controller', () => {
         fecha_de_vencimiento: '2023-12-31'
       };
 
-      const mockFactura = { id: 1, ...req.body, status: 'pendiente', userId: 1 };
+      const mockFactura = { id: '550e8400-e29b-41d4-a716-446655440001', ...req.body, status: 'pendiente', userId: '550e8400-e29b-41d4-a716-446655440000' };
       Factura.create.mockResolvedValue(mockFactura);
 
       await facturasController.createFactura(req, res);
@@ -65,7 +67,7 @@ describe('Facturas Controller', () => {
         factura: 'Factura 001',
         total: 1000,
         status: 'pendiente',
-        userId: 1
+        userId: '550e8400-e29b-41d4-a716-446655440000'
       }));
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
@@ -94,7 +96,7 @@ describe('Facturas Controller', () => {
     it('should return a list of facturas', async () => {
       Factura.findAndCountAll.mockResolvedValue({
         count: 1,
-        rows: [{ id: 1, factura: 'Factura 001' }]
+        rows: [{ id: '550e8400-e29b-41d4-a716-446655440001', factura: 'Factura 001' }]
       });
 
       await facturasController.getFacturas(req, res);
@@ -103,7 +105,7 @@ describe('Facturas Controller', () => {
       expect(res.json).toHaveBeenCalledWith({
         status: 'success',
         data: {
-          facturas: [{ id: 1, factura: 'Factura 001' }],
+          facturas: [{ id: '550e8400-e29b-41d4-a716-446655440001', factura: 'Factura 001' }],
           totalFacturas: 1,
           totalPages: 1,
           currentPage: 1
@@ -114,13 +116,13 @@ describe('Facturas Controller', () => {
 
   describe('getFacturaById', () => {
     it('should return a factura by ID', async () => {
-      req.params = { id: 1 };
-      const mockFactura = { id: 1, factura: 'Factura 001' };
+      req.params = { id: '550e8400-e29b-41d4-a716-446655440001' };
+      const mockFactura = { id: '550e8400-e29b-41d4-a716-446655440001', factura: 'Factura 001' };
       Factura.findOne.mockResolvedValue(mockFactura);
 
       await facturasController.getFacturaById(req, res);
 
-      expect(Factura.findOne).toHaveBeenCalledWith({ where: { id: 1, userId: 1 } });
+      expect(Factura.findOne).toHaveBeenCalledWith({ where: { id: '550e8400-e29b-41d4-a716-446655440001', userId: '550e8400-e29b-41d4-a716-446655440000' } });
       expect(res.json).toHaveBeenCalledWith({
         status: 'success',
         data: mockFactura
@@ -128,7 +130,7 @@ describe('Facturas Controller', () => {
     });
 
     it('should return 404 if factura not found', async () => {
-      req.params = { id: 1 };
+      req.params = { id: '550e8400-e29b-41d4-a716-446655440001' };
       Factura.findOne.mockResolvedValue(null);
 
       await facturasController.getFacturaById(req, res);
@@ -140,11 +142,11 @@ describe('Facturas Controller', () => {
 
   describe('updateFacturaStatus', () => {
     it('should update factura status successfully', async () => {
-      req.params = { id: 1 };
+      req.params = { id: '550e8400-e29b-41d4-a716-446655440001' };
       req.body = { status: 'pagada' };
       
       const mockFactura = {
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440001',
         status: 'pendiente',
         save: jest.fn().mockResolvedValue(true)
       };
@@ -163,10 +165,10 @@ describe('Facturas Controller', () => {
 
   describe('deleteFactura', () => {
     it('should delete factura successfully', async () => {
-      req.params = { id: 1 };
+      req.params = { id: '550e8400-e29b-41d4-a716-446655440001' };
       
       const mockFactura = {
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440001',
         destroy: jest.fn().mockResolvedValue(true)
       };
       Factura.findOne.mockResolvedValue(mockFactura);

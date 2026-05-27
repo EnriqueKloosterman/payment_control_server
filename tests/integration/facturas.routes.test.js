@@ -17,8 +17,8 @@ describe('Facturas Routes (Integration)', () => {
     token = 'Bearer valid-jwt-token';
     
     // Auth Middleware mocks
-    jwt.verify.mockReturnValue({ id: 1 });
-    User.findByPk.mockResolvedValue({ id: 1, email: 'test@test.com' });
+    jwt.verify.mockReturnValue({ id: '550e8400-e29b-41d4-a716-446655440000' });
+    User.findByPk.mockResolvedValue({ id: '550e8400-e29b-41d4-a716-446655440000', email: 'test@test.com' });
   });
 
   describe('Authentication Check', () => {
@@ -33,7 +33,7 @@ describe('Facturas Routes (Integration)', () => {
     it('should return 200 and a list of facturas', async () => {
       Factura.findAndCountAll.mockResolvedValue({
         count: 1,
-        rows: [{ id: 1, factura: 'Test Factura' }]
+        rows: [{ id: '550e8400-e29b-41d4-a716-446655440001', factura: 'Test Factura' }]
       });
 
       const response = await request(app)
@@ -62,7 +62,7 @@ describe('Facturas Routes (Integration)', () => {
 
     it('should create factura successfully', async () => {
       Factura.create.mockResolvedValue({
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440001',
         factura: 'F-001',
         total: 100,
         status: 'pendiente'

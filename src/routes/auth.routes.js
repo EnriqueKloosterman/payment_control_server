@@ -1,6 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/auth.controller');
-const { validateRegister, validateLogin, validateResetPassword } = require('../middlewares/auth.validator');
+const { validateRegister, validateLogin, validateResetPassword, validateForgotPassword, validateRefreshToken } = require('../middlewares/auth.validator');
 const { protect } = require('../middlewares/auth.middleware');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
@@ -103,7 +103,7 @@ router.post('/login', loginLimiter, validateLogin, authController.login);
  *       401:
  *         description: Invalid or expired refresh token
  */
-router.post('/refresh', authController.refresh);
+router.post('/refresh', validateRefreshToken, authController.refresh);
 
 /**
  * @swagger
@@ -143,7 +143,7 @@ router.post('/logout', protect, authController.logout);
  *       404:
  *         description: User not found
  */
-router.post('/forgotpassword', authController.forgotPassword);
+router.post('/forgotpassword', validateForgotPassword, authController.forgotPassword);
 
 /**
  * @swagger
